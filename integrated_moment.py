@@ -6,9 +6,9 @@ from astronomy_image import AstroImage
 
 class IntegratedMoment(AstroImage):
     """The moment 0 map of a radio observation."""
-    def __init__(self, cube_name: str) -> None:
+    def __init__(self, moment_0_name: str) -> None:
         """Initializing the moment map by reading in the file name."""
-        super().__init__(cube_name)
+        super().__init__(moment_0_name)
         self.bmaj = self.header['BMAJ'] * 3600
         self.bmin = self.header['BMIN'] * 3600
         self.bpa = self.header['BPA']
