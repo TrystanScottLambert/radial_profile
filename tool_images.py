@@ -6,7 +6,8 @@ from astropy.utils.exceptions import AstropyWarning
 warnings.simplefilter('ignore', category=AstropyWarning)
 from astropy.wcs import WCS
 from astropy.stats import sigma_clipped_stats
-from astropy.convolution import Gaussian2DKernel
+from astropy.
+ import Gaussian2DKernel
 from astropy.convolution import convolve, convolve_fft
 import matplotlib.pyplot as plt
 import numpy as np

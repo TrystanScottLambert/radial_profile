@@ -3,29 +3,35 @@ Helper functions.
 """
 
 import numpy as np
-from astropy.io.fits.hdu.table import BinTableHDU
+from astropy.io.fits.header import Header
 from astropy.io.fits.hdu.hdulist import HDUList
+from astropy.io.fits.hdu.image import ImageHDU
 
+def determine_hdu_index(hdul: HDUList) -> int:
+    """Determines the hdu index which has the correct data and header."""
+    image_hdu = False
+    for i, hdu in enumerate(hdul):
+        if isinstance(hdu, ImageHDU):
+            image_hdu = True
+            index = i
 
-def determine_average_beam_properties(beam_table: BinTableHDU) -> list[float]:
-    """
-    Reads in a beam table and determines the
-    average BMAJ, BMIN, and BPA.
-    """
+    if not image_hdu:
+        for i, hdu in enumerate(hdul):
+            try:
+                _  = hdul[0].data
+                index = i
+                break
+            except AttributeError:
+                pass
 
-    avg_bmaj = np.mean(beam_table.data.field('BMAJ'))
-    avg_bmin = np.mean(beam_table.data.field('BMIN'))
-    avg_bpa = np.mean(beam_table.data.field('BPA'))
+    return index
 
-    return avg_bmaj, avg_bmin, avg_bpa
-
-def find_index_of_beam_table(hdul: HDUList) -> int:
-    """
-    Searches a hdu list and determines
-    the position of the beam table if it exists.
-    """
-    for i, hdu_item in enumerate(hdul):
-        if isinstance(hdu_item, BinTableHDU):
-            if 'BMAJ' in str(hdu_item.header):
-                return i
-    print('No beam table found.')
+def read_pixscale_from_header(header: Header) -> float:
+    """Determines the pixel scale from the given header object."""
+    try:
+        pix_scale = np.abs(header['CDELT2'])
+        if pix_scale == 1:
+            pix_scale = header['CD2_2']
+    except KeyError:
+        pix_scale = header['CD2_2']
+    return pix_scale
